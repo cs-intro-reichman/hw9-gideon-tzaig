@@ -58,7 +58,31 @@ public class MemorySpace {
 	 * @return the base address of the allocated block, or -1 if unable to allocate
 	 */
 	public int malloc(int length) {		
-		//// Replace the following statement with your code
+		// searching a free memory block that big enough to contain the wanted allocated block and return the new block
+		/// if there is no one big enough, returns -1
+		ListIterator iterator = new ListIterator(freeList.getFirst());
+		if (iterator.current == null) return -1;
+		MemoryBlock currentFree = iterator.current.block;
+		MemoryBlock newAlloc = null;
+		
+		for (int i = 0; i < freeList.getSize(); i ++) {
+			if (currentFree.length >= length) {
+				newAlloc = new MemoryBlock(currentFree.baseAddress, length);
+				allocatedList.addLast(newAlloc);
+
+				if (allocatedList.getLast().equals(currentFree) == false) {
+					MemoryBlock shortenMB = new MemoryBlock(currentFree.baseAddress + length, currentFree.length - length);
+					freeList.add(i, shortenMB);
+				}
+
+				freeList.remove(currentFree);
+
+				return newAlloc.baseAddress;
+			}
+
+			
+			if (iterator.hasNext()) currentFree = iterator.next();
+		}
 		return -1;
 	}
 
@@ -71,7 +95,21 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		//// Write your code here
+		// getting an address of a block to delete from alloc list and add to free list
+		ListIterator iterator = new ListIterator(allocatedList.getFirst());
+		if (iterator.current == null) return;
+		MemoryBlock currentBlock = iterator.current.block;
+
+		for (int i = 0; i < allocatedList.getSize(); i ++) {
+			if (currentBlock.baseAddress == address) {
+				freeList.addLast(currentBlock);
+				allocatedList.remove(currentBlock);
+				return;
+			}
+
+			
+			if (iterator.hasNext()) currentBlock = iterator.next();
+		}
 	}
 	
 	/**
@@ -88,6 +126,25 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-		//// Write your code here
+		// checking each block if exist another free block that can be connected at the end
+		/// if so, creates a new long one and deletes the short ones
+		ListIterator iterator = new ListIterator(freeList.getFirst());
+		if (iterator.current == null) return;
+		MemoryBlock currentMemoryBlock = iterator.current.block;
+		
+		for (int i = 0; i < freeList.getSize(); i ++) {
+			Node comparedNode = freeList.getNode(i);
+			MemoryBlock iteratorCompare = comparedNode.block;
+			if (currentMemoryBlock.equals(iteratorCompare)) continue;
+
+			if (currentMemoryBlock.baseAddress + currentMemoryBlock.length == iteratorCompare.baseAddress) {
+				MemoryBlock combainedBlock = new MemoryBlock(currentMemoryBlock.baseAddress, currentMemoryBlock.length + iteratorCompare.length);
+				freeList.addLast(combainedBlock);
+				freeList.remove(comparedNode);
+				freeList.remove(currentMemoryBlock);
+			}
+			
+			if (iterator.hasNext()) currentMemoryBlock = iterator.next();
+		}
 	}
 }
