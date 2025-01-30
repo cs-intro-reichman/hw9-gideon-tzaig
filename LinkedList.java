@@ -209,26 +209,32 @@ public class LinkedList {
 	public void remove(Node node) {
 		// find the node and disconnect it from the linked list
 		if (this.size == 0) return;
+		Node prevNode = null;
 		Node currentNode = this.getFirst();
 
-		if (currentNode.block.equals(node.block)) {
-			this.first = currentNode.next;
-			currentNode.next = null;
-			size --;
-			return;
-		}
-
-		for (int i = 0; i < this.getSize(); i ++) {
-			Node nextNode = currentNode.next;
-			if (nextNode.block.equals(node.block)) {
-				currentNode.next = nextNode.next;
-				nextNode.next = null;
-				size --;
-				return;
-			}
-
+		// itaretes till finds the wanted node
+		while (currentNode != null && (currentNode.block.equals(node.block) == false)) {
+			prevNode = currentNode;
 			currentNode = currentNode.next;
 		}
+		
+		// return if not found
+		if (currentNode == null) return;
+		// if its the first node, disconnect it
+		if (prevNode == null) {
+			this.first = this.getFirst().next;
+		}
+		// if its the last node, disconnect it and redefine the last
+		else if (currentNode.next == null) {
+			prevNode.next = null;
+			this.last = prevNode;
+		}
+		// for every other node
+		else {
+			prevNode.next = currentNode.next;
+		}
+
+		size --;
 	}
 
 	/**
