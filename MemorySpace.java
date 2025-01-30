@@ -66,7 +66,7 @@ public class MemorySpace {
 		MemoryBlock newAlloc = null;
 		
 		for (int i = 0; i < freeList.getSize(); i ++) {
-			if (currentFree.length >= length) {
+ 			if (currentFree.length >= length) {
 				newAlloc = new MemoryBlock(currentFree.baseAddress, length);
 				allocatedList.addLast(newAlloc);
 
@@ -102,7 +102,8 @@ public class MemorySpace {
 
 		for (int i = 0; i < allocatedList.getSize(); i ++) {
 			if (currentBlock.baseAddress == address) {
-				freeList.addLast(currentBlock);
+				Node newFree = new Node(currentBlock);
+				freeList.addLast(newFree.block);
 				allocatedList.remove(currentBlock);
 				return;
 			}
@@ -134,6 +135,7 @@ public class MemorySpace {
 		
 		for (int i = 0; i < freeList.getSize(); i ++) {
 			Node comparedNode = freeList.getNode(i);
+			if (comparedNode == null) return;
 			MemoryBlock iteratorCompare = comparedNode.block;
 			if (currentMemoryBlock.equals(iteratorCompare)) continue;
 

@@ -97,8 +97,8 @@ public class LinkedList {
 		Node lastNode = this.getLast();
 
 		if (index == 0) {
-			this.first = newNode;
 			newNode.next = firstNode;
+			this.first = newNode;
 		}
 		else if (index == this.size) {
 			lastNode.next = newNode;
@@ -106,7 +106,7 @@ public class LinkedList {
 		}
 		else {
 			Node beforeNode = this.getNode(index - 1);
-			Node nextNode = this.getNode(index);
+			Node nextNode = beforeNode.next;
 			
 			beforeNode.next = newNode;
 			newNode.next = nextNode;
