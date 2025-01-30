@@ -132,23 +132,33 @@ public class MemorySpace {
 		ListIterator iterator = new ListIterator(freeList.getFirst());
 		if (iterator.current == null) return;
 		MemoryBlock currentMemoryBlock = iterator.current.block;
+		LinkedList deleteList = new LinkedList();
 		
 		while (iterator.hasNext()) {
 			for (int i = 0; i < freeList.getSize(); i ++) {
 				Node comparedNode = freeList.getNode(i);
 				if (comparedNode == null) return;
 				MemoryBlock iteratorCompare = comparedNode.block;
-				if (currentMemoryBlock.equals(iteratorCompare)) continue;
+				if (currentMemoryBlock.equals(iteratorCompare) || iteratorCompare == null) continue;
 	
 				if (currentMemoryBlock.baseAddress + currentMemoryBlock.length == iteratorCompare.baseAddress) {
 					MemoryBlock combainedBlock = new MemoryBlock(currentMemoryBlock.baseAddress, currentMemoryBlock.length + iteratorCompare.length);
 					freeList.addLast(combainedBlock);
-					freeList.remove(currentMemoryBlock);
-					freeList.remove(comparedNode);
+					deleteList.addLast(currentMemoryBlock);
+					deleteList.addLast(iteratorCompare);
 				}
 			}
 
 			currentMemoryBlock = iterator.next();
-		}	
+		}
+		
+		if (deleteList.getSize() != 0) {
+			Node currentDelete = deleteList.getFirst();
+
+			while (currentDelete != null) {
+				freeList.remove(currentDelete);
+				currentDelete = currentDelete.next;
+			}
+		}
 	}
 }
